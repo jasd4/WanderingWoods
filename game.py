@@ -58,7 +58,7 @@ class Game:
 
         self.groups = [[player] for player in self.players]
 
-        self.font = pygame.font.SysFont("Arial", 24)  # Font for step counter
+        self.font = pygame.font.SysFont("Arial", 16)  # Font for step counter
 
 
 
