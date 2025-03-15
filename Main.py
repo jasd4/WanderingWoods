@@ -16,6 +16,7 @@ from game import Game
 import pygame as pg
 import pygame_gui as pgg
 import sys
+import os
 
 pg.init()
 pg.font.init()
@@ -49,9 +50,30 @@ class MenuButton():
         window.blit(display_text, (self._x + 7, self._y + 3))
 
 
-### FUNCTION CREATIONS ###
 
 
+def play_audio_file(fileName):
+    pg.mixer.init()
+
+    current_directory = os.path.dirname(os.path.abspath(__file__))
+    mp3_file_path = os.path.join(current_directory, "AudioFiles", fileName)
+
+    # checks if audio is already playing
+    if pg.mixer.music.get_busy():
+        pg.mixer.music.stop()  # Stop any music that might already be playing
+
+    try:
+        # Load and play MP3 file once
+        pg.mixer.music.load(mp3_file_path)
+        pg.mixer.music.play(loops=0)
+
+        # Wait until the music finishes playing
+        while pg.mixer.music.get_busy():  # Keep playing until it's done
+            pg.time.Clock().tick(10)  # Delay to avoid high CPU usage during the wait
+
+    except Exception as e:
+        print(f"Error loading or playing the file: {e}")
+    return None
 
 
 ### WINDOW CREATIONS ###
@@ -66,7 +88,40 @@ def about_window():
 
     return_button = MenuButton(225, 25, 75, 25, "Main Menu")  # Creates button to return to the main menu and About text
     return_button.draw(about_screen)
-    # RRFIX: Add text
+
+    About = [  # Short game Description
+        "Wandering in the Woods is a game where players are",
+        "simulated wandering through the dark and ominous woods.",
+        "It is very dark in the woods, so you must wander",
+        "aimlessly. How long will it take to find your friends?"
+    ]
+
+    How_to_Play = [  # How to play- susceptible to change
+        "How to Play:",
+        "1. Select the difficulty (K-2, 3-5, 6-8).",
+        "2. Select the grid size and number of players (2-5 and up).",
+        "3. Watch as players wander aimlessly through the woods.",
+        "4. The goal is to reach all of your friends in the woods.",
+        "5. Have fun and good luck!"
+    ]
+
+    # Draw the text
+    y_offset = 60  # Start position for the first line of text
+
+    for line in About:
+        text_surface = main_font.render(line, True, (0, 0, 0))
+        about_screen.blit(text_surface, (20, y_offset))
+        y_offset += 10
+
+    y_offset += 20  # Extra spacing between how to play
+
+    for line in How_to_Play:  ## Loop that prints each line in how to play txt
+        text_surface = main_font.render(line, True, (0, 0, 0))  # Black color for text
+        about_screen.blit(text_surface, (20, y_offset))  # Draw text with an offset
+        y_offset += 30  # Increase y position for the next line of text
+
+    # Update the display
+    pg.display.flip()
 
     running = True
 
@@ -166,7 +221,7 @@ def selection_window():
 
 ## Grid and Player Selection function creates a new window that takes in previously selected grid width, height, and # of players ##
 ## and lets the user pick where each player will be starting on the grid ##
-def grid_and_player_selection(grid_width, grid_height, number_of_players,):
+def grid_and_player_selection(grid_width, grid_height, number_of_players, stats=None):
 
     cell_size = 50  # Size of each grid cell
     grid_offset_x, grid_offset_y = 50, 100  # Where the grid starts
@@ -266,7 +321,7 @@ def grid_and_player_selection(grid_width, grid_height, number_of_players,):
                     print("Game Starting with selected positions:", selected_positions)
 
 
-                    game = Game(grid_width, grid_height, list(selected_positions.values()), cell_size=40,selection_func=grid_and_player_selection)
+                    game = Game(grid_width, grid_height, list(selected_positions.values()), stats=stats, cell_size=40,selection_func=grid_and_player_selection)
 
                     game.run()
             pgmanager.process_events(event)

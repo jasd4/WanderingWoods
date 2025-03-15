@@ -40,5 +40,3 @@ class Player:  # Player position
 
     def draw(self, screen): # draws the player on the grid
         pg.draw.rect(screen, self.color, self.rect)
-
-
