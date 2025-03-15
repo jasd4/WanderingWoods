@@ -58,4 +58,4 @@ class Stats:
                 for line in data:
                     print(line.strip())  # Display saved stats
         except FileNotFoundError:
-            print("No saved stats found")
+            print("No saved stats found.")
